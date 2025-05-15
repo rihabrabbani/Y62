@@ -1,0 +1,47 @@
+const ytdl = require('ytdl-core');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('ffmpeg-static');
+const fs = require('fs');
+const path = require('path');
+
+ffmpeg.setFfmpegPath(ffmpegPath);
+
+async function downloadVideo(url, resolution = '2160') {
+    const info = await ytdl.getInfo(url);
+
+    // Get the best video and audio formats
+    const videoFormat = ytdl.chooseFormat(info.formats, { quality: `highestvideo` });
+    const audioFormat = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' });
+
+    if (!videoFormat || !audioFormat) {
+        console.error('Could not find suitable formats.');
+        return;
+    }
+
+    console.log(`Downloading video: ${info.videoDetails.title}`);
+
+    // Output paths
+    const outputPath = `${info.videoDetails.title}.mp4`;
+    const videoStream = ytdl.downloadFromInfo(info, { format: videoFormat });
+    const audioStream = ytdl.downloadFromInfo(info, { format: audioFormat });
+
+    // Merge video and audio
+    ffmpeg()
+        .input(videoStream)
+        .input(audioStream)
+        .videoCodec('copy')
+        .audioCodec('aac')
+        .audioBitrate(192)
+        .output(outputPath)
+        .on('end', () => {
+            console.log(`Download completed: ${outputPath}`);
+        })
+        .on('error', (err) => {
+            console.error('Error:', err.message);
+        })
+        .run();
+}
+
+// Example usage
+const videoUrl = 'https://www.youtube.com/watch?v=8of5w7RgcTc';
+downloadVideo(videoUrl, '1080');
