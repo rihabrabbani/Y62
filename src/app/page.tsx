@@ -1,22 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaYoutube, FaDownload, FaRocket, FaCrown } from "react-icons/fa";
+import { FaYoutube, FaDownload, FaRocket, FaCrown, FaArrowDown, FaPlayCircle } from "react-icons/fa";
 import DownloadForm from "../components/DownloadForm";
 
 export default function Home() {
   const [showDemo, setShowDemo] = useState(false);
+  const [activeFeature, setActiveFeature] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Animation effect when component mounts
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
+  // Auto-rotate features
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveFeature((prev) => (prev + 1) % 6);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-red-600 to-red-800 py-20 px-4 text-white">
-        <div className="container mx-auto max-w-6xl flex flex-col lg:flex-row items-center justify-between">
-          <div className="lg:w-1/2 mb-10 lg:mb-0">
+      <section className="bg-gradient-to-r from-red-600 to-red-800 py-20 px-4 text-white relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -right-40 -top-40 w-96 h-96 bg-red-400/30 rounded-full blur-3xl"></div>
+          <div className="absolute -left-20 -bottom-40 w-80 h-80 bg-red-700/20 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="container mx-auto max-w-6xl flex flex-col lg:flex-row items-center justify-between relative z-10">
+          <div className={`lg:w-1/2 mb-10 lg:mb-0 transition-all duration-1000 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
-              Download YouTube Videos <span className="text-yellow-300">Faster</span>
+              Download YouTube Videos <span className="relative inline-block">
+                <span className="text-yellow-300">Faster</span>
+                <span className="absolute bottom-0 left-0 w-full h-1 bg-yellow-300/70 transform -skew-x-12"></span>
+              </span>
             </h1>
             <p className="text-lg sm:text-xl mb-8 text-gray-100 max-w-lg">
               High-quality YouTube video downloads with our powerful, easy-to-use service. Try it free for your first 10 downloads!
@@ -24,37 +48,42 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link 
                 href="/download" 
-                className="bg-white text-red-600 hover:bg-yellow-100 transition-colors py-3 px-8 rounded-full font-bold text-lg flex items-center justify-center gap-2"
+                className="bg-white text-red-600 hover:bg-yellow-100 transition-all py-3 px-8 rounded-full font-bold text-lg flex items-center justify-center gap-2 shadow-lg hover:shadow-xl hover:shadow-white/20 fancy-button group"
               >
-                <FaDownload /> Start Downloading
+                <FaDownload className="group-hover:animate-bounce" /> Start Downloading
               </Link>
               <button 
                 onClick={() => setShowDemo(true)}
-                className="bg-transparent border-2 border-white hover:bg-white/10 transition-colors py-3 px-8 rounded-full font-bold text-lg flex items-center justify-center gap-2"
+                className="bg-transparent border-2 border-white hover:bg-white/10 transition-all py-3 px-8 rounded-full font-bold text-lg flex items-center justify-center gap-2 group"
               >
-                <FaYoutube /> How It Works
+                <FaPlayCircle className="group-hover:scale-110 transition-transform" /> How It Works
               </button>
             </div>
           </div>
-          <div className="lg:w-1/2 flex justify-center">
+          <div className={`lg:w-1/2 flex justify-center transition-all duration-1000 delay-300 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
             <div className="relative w-full max-w-md">
-              <div className="absolute -top-4 -left-4 w-full h-full bg-yellow-400 rounded-lg rotate-3"></div>
-              <div className="absolute -top-2 -left-2 w-full h-full bg-red-400 rounded-lg -rotate-2"></div>
-              <div className="relative bg-white p-6 rounded-lg shadow-xl">
-                <DownloadForm homepageVersion={true} onSubmit={function (url: string): void {
-                  throw new Error("Function not implemented.");
-                } } />
+              <div className="absolute -top-6 -right-6 w-full h-full bg-yellow-400/70 rounded-lg rotate-6 blur-sm"></div>
+              <div className="absolute -top-3 -right-3 w-full h-full bg-red-400/70 rounded-lg -rotate-3 blur-sm"></div>
+              <div className="relative bg-white/95 dark:bg-gray-900/95 p-6 rounded-lg shadow-xl backdrop-blur-sm border border-white/50 dark:border-gray-800/50">
+                <DownloadForm homepageVersion={true} onSubmit={() => {
+                  window.location.href = '/download';
+                }} />
               </div>
             </div>
           </div>
         </div>
+        
+        {/* Scroll indicator */}
+        <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <FaArrowDown className="text-white/70" />
+        </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-white dark:bg-gray-900">
+      <section className="py-20 px-4 bg-white dark:bg-gray-900 relative">
         <div className="container mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-16 text-gray-800 dark:text-white">
-            Why Choose Y62 <span className="text-red-600">Downloader</span>
+            Why Choose Y62 <span className="red-gradient-text">Downloader</span>
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -90,10 +119,23 @@ export default function Home() {
                 description: "Simple interface makes downloading videos a breeze."
               }
             ].map((feature, index) => (
-              <div key={index} className="bg-gray-50 dark:bg-gray-800 p-8 rounded-xl shadow-md hover:shadow-lg transition-all hover:-translate-y-1">
-                <div className="mb-5">{feature.icon}</div>
+              <div 
+                key={index} 
+                className={`bg-gray-50 dark:bg-gray-800 p-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1 border border-transparent ${
+                  activeFeature === index ? 'border-red-400/50 shadow-lg shadow-red-500/10' : ''
+                }`}
+                onMouseEnter={() => setActiveFeature(index)}
+              >
+                <div className={`mb-5 transition-transform duration-500 ${activeFeature === index ? 'scale-110' : ''}`}>
+                  {feature.icon}
+                </div>
                 <h3 className="text-xl font-bold mb-3 text-gray-800 dark:text-white">{feature.title}</h3>
                 <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
+                
+                {/* Animated border accent */}
+                <div className={`h-1 w-0 bg-gradient-to-r from-red-500 to-red-300 mt-4 rounded-full transition-all duration-500 ${
+                  activeFeature === index ? 'w-1/3' : 'w-0'
+                }`}></div>
               </div>
             ))}
           </div>
@@ -101,15 +143,18 @@ export default function Home() {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 px-4 bg-gray-50 dark:bg-gray-950">
+      <section className="py-20 px-4 bg-gray-50 dark:bg-gray-950 relative">
+        {/* Decorative elements */}
+        <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-white dark:from-gray-900 to-transparent"></div>
+        
         <div className="container mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-16 text-gray-800 dark:text-white">
-            Simple <span className="text-red-600">Pricing</span>
+            Simple <span className="red-gradient-text">Pricing</span>
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* Free Plan */}
-            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border-2 border-gray-100 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border-2 border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300 group">
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-bold text-gray-800 dark:text-white">Free Plan</h3>
                 <p className="text-gray-500 dark:text-gray-400 mt-2">Try before you buy</p>
@@ -154,16 +199,16 @@ export default function Home() {
               
               <Link
                 href="/register" 
-                className="w-full block text-center bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors py-3 px-6 rounded-xl font-bold"
+                className="w-full block text-center bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors py-3 px-6 rounded-xl font-bold group-hover:bg-red-100 dark:group-hover:bg-red-900/20 group-hover:text-red-600 dark:group-hover:text-red-400"
               >
                 Sign Up Free
               </Link>
             </div>
             
             {/* Premium Plan */}
-            <div className="bg-gradient-to-br from-red-500 to-red-700 p-8 rounded-2xl shadow-lg text-white transform scale-105">
+            <div className="bg-gradient-to-br from-red-500 to-red-700 p-8 rounded-2xl shadow-lg text-white transform scale-105 hover:scale-110 transition-all duration-300">
               <div className="text-center mb-6">
-                <span className="px-4 py-1 bg-yellow-400 text-red-800 text-xs font-bold uppercase rounded-full inline-block mb-4">MOST POPULAR</span>
+                <span className="px-4 py-1 bg-gradient-to-r from-amber-300 to-yellow-400 text-red-800 text-xs font-bold uppercase rounded-full inline-block mb-4 shadow-md">MOST POPULAR</span>
                 <h3 className="text-2xl font-bold">Premium Plan</h3>
                 <p className="text-red-100 mt-2">Unlimited access</p>
                 <div className="mt-4">
@@ -207,10 +252,15 @@ export default function Home() {
               
               <Link
                 href="/premium" 
-                className="w-full block text-center bg-white text-red-600 hover:bg-yellow-50 transition-colors py-3 px-6 rounded-xl font-bold"
+                className="w-full block text-center bg-white text-red-600 hover:bg-yellow-50 transition-colors py-3 px-6 rounded-xl font-bold shadow-lg hover:shadow-xl"
               >
                 Get Premium
               </Link>
+
+              {/* Animated corner accent */}
+              <div className="absolute -top-1 -right-1 w-16 h-16 overflow-hidden">
+                <div className="shimmer absolute top-0 right-0 w-20 h-2 bg-yellow-300/50 rotate-45 translate-x-2 translate-y-4"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -220,7 +270,7 @@ export default function Home() {
       <section className="py-20 px-4 bg-white dark:bg-gray-900">
         <div className="container mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl font-bold text-center mb-16 text-gray-800 dark:text-white">
-            What Our <span className="text-red-600">Users Say</span>
+            What Our <span className="red-gradient-text">Users Say</span>
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -244,7 +294,7 @@ export default function Home() {
                 avatar: "https://randomuser.me/api/portraits/women/68.jpg"
               }
             ].map((testimonial, index) => (
-              <div key={index} className="bg-gray-50 dark:bg-gray-800 p-8 rounded-xl shadow-md">
+              <div key={index} className="bg-gray-50 dark:bg-gray-800 p-8 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700">
                 <div className="flex items-center mb-4">
                   {[...Array(5)].map((_, i) => (
                     <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -254,7 +304,7 @@ export default function Home() {
                 </div>
                 <p className="text-gray-600 dark:text-gray-300 mb-6 italic">"{testimonial.quote}"</p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 mr-4 overflow-hidden rounded-full">
+                  <div className="w-12 h-12 mr-4 overflow-hidden rounded-full ring-2 ring-red-500/20">
                     <Image src={testimonial.avatar} alt={testimonial.name} width={48} height={48} />
                   </div>
                   <div>
@@ -269,8 +319,15 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-red-600 to-red-800 text-white">
-        <div className="container mx-auto max-w-4xl text-center">
+      <section className="py-20 px-4 bg-gradient-to-r from-red-600 to-red-800 text-white relative overflow-hidden">
+        {/* Animated background elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-white/10 to-transparent"></div>
+          <div className="absolute -right-40 -bottom-40 w-96 h-96 bg-red-400/30 rounded-full blur-3xl"></div>
+          <div className="absolute -left-20 top-10 w-80 h-80 bg-red-700/20 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="container mx-auto max-w-4xl text-center relative z-10">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to start downloading?</h2>
           <p className="text-xl mb-10 text-red-100 max-w-2xl mx-auto">
             Try Y62 Downloader today with 10 free downloads. No credit card required.
@@ -278,13 +335,13 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/download" 
-              className="bg-white text-red-600 hover:bg-yellow-100 transition-colors py-3 px-8 rounded-full font-bold text-lg"
+              className="bg-white text-red-600 hover:bg-yellow-100 transition-all py-3 px-8 rounded-full font-bold text-lg shadow-lg hover:shadow-xl hover:shadow-white/20"
             >
               Start Downloading
             </Link>
             <Link 
               href="/premium" 
-              className="bg-transparent border-2 border-white hover:bg-white/10 transition-colors py-3 px-8 rounded-full font-bold text-lg"
+              className="bg-transparent border-2 border-white hover:bg-white/10 transition-all py-3 px-8 rounded-full font-bold text-lg"
             >
               View Premium Plan
             </Link>
@@ -297,24 +354,31 @@ export default function Home() {
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             <div>
-              <h3 className="text-xl font-bold mb-4">Y62 Downloader</h3>
+              <div className="flex items-center mb-4">
+                <div className="h-10 w-10 bg-gradient-to-br from-red-500 to-red-700 rounded-lg flex items-center justify-center">
+                  <FaDownload className="h-5 w-5 text-white" />
+                </div>
+                <span className="ml-2 text-xl font-bold font-heading">
+                  <span className="text-red-500">Y62</span>
+                  <span className="text-white">Downloader</span>
+                </span>
+              </div>
               <p className="text-gray-400">The best YouTube video downloader with high-quality downloads and lightning-fast speeds.</p>
             </div>
             <div>
               <h3 className="text-xl font-bold mb-4">Links</h3>
               <ul className="space-y-2">
-                <li><Link href="/download" className="text-gray-400 hover:text-white">Download</Link></li>
-                <li><Link href="/premium" className="text-gray-400 hover:text-white">Premium</Link></li>
-                <li><Link href="/login" className="text-gray-400 hover:text-white">Login</Link></li>
-                <li><Link href="/register" className="text-gray-400 hover:text-white">Register</Link></li>
-                
+                <li><Link href="/download" className="text-gray-400 hover:text-white transition-colors">Download</Link></li>
+                <li><Link href="/premium" className="text-gray-400 hover:text-white transition-colors">Premium</Link></li>
+                <li><Link href="/login" className="text-gray-400 hover:text-white transition-colors">Login</Link></li>
+                <li><Link href="/register" className="text-gray-400 hover:text-white transition-colors">Register</Link></li>
               </ul>
             </div>
             <div>
               <h3 className="text-xl font-bold mb-4">Legal</h3>
               <ul className="space-y-2">
-                <li><Link href="/terms" className="text-gray-400 hover:text-white">Terms of Service</Link></li>
-                <li><Link href="/privacy" className="text-gray-400 hover:text-white">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="text-gray-400 hover:text-white transition-colors">Terms of Service</Link></li>
+                <li><Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</Link></li>
               </ul>
             </div>
           </div>
@@ -326,18 +390,46 @@ export default function Home() {
 
       {/* Modal for demo video */}
       {showDemo && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setShowDemo(false)}>
-          <div className="bg-white dark:bg-gray-900 p-4 rounded-lg max-w-3xl w-full" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 animate-fadeIn" onClick={() => setShowDemo(false)}>
+          <div className="bg-white dark:bg-gray-900 p-6 rounded-xl max-w-3xl w-full shadow-2xl transform transition-all duration-300 scale-100 opacity-100" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white">How Y62 Downloader Works</h3>
-              <button onClick={() => setShowDemo(false)} className="text-gray-500 hover:text-gray-700">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white">How Y62 Downloader Works</h3>
+              <button onClick={() => setShowDemo(false)} className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-full transition-colors">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center">
-              <p className="text-gray-500 dark:text-gray-400">Demo Video Placeholder</p>
+            <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="h-20 w-20 bg-red-600/90 rounded-full flex items-center justify-center">
+                  <FaPlayCircle className="text-white text-4xl" />
+                </div>
+              </div>
+              <p className="text-gray-500 dark:text-gray-400 z-10">Demo Video Placeholder</p>
+            </div>
+            <div className="mt-6 text-center">
+              <p className="text-gray-700 dark:text-gray-300">
+                Follow these simple steps to download any YouTube video:
+              </p>
+              <ol className="text-left mt-4 space-y-2 text-gray-600 dark:text-gray-400">
+                <li className="flex items-start">
+                  <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full h-6 w-6 flex items-center justify-center mr-2 mt-0.5">1</span>
+                  <span>Copy the YouTube video URL you want to download</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full h-6 w-6 flex items-center justify-center mr-2 mt-0.5">2</span>
+                  <span>Paste the URL into Y62 Downloader</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full h-6 w-6 flex items-center justify-center mr-2 mt-0.5">3</span>
+                  <span>Select your preferred video quality and format</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full h-6 w-6 flex items-center justify-center mr-2 mt-0.5">4</span>
+                  <span>Click download and enjoy your video!</span>
+                </li>
+              </ol>
             </div>
           </div>
         </div>
